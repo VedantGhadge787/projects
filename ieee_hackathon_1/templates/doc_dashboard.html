@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Doctor Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="popup-alert" id="popupAlert">
+      {% for message in messages %}
+        {{ message }}
+      {% endfor %}
+    </div>
+    <script>
+      
+      setTimeout(() => {
+        const alert = document.getElementById('popupAlert');
+        if (alert) alert.style.display = 'none';
+      }, 3000);
+    </script>
+  {% endif %}
+  {% endwith %}
+
+
+  <div class="container">
+    <h2>Welcome, Dr. {{ user_name or "Doctor" }}!</h2>
+
+    <div class="dashboard-section">
+      <h3>Upcoming Appointments</h3>
+      <p>You can view or manage your upcoming appointments here.</p>
+      <a href="/appointments"><button>View Appointments</button></a>
+    </div>
+
+    

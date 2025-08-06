@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Clinic</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Select a Clinic</h2>
+        <form action="{{ url_for('go_to_doctor_page') }}" method="POST" class="form-box">
+            <label for="clinic">Choose a clinic:</label>
+            <select name="clinic_id" id="clinic" required>
+                {% for clinic in clinics %}
+                    <option value="{{ clinic.id }}">{{ clinic.name }} - {{ clinic.location }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Continue</button>
+        </form>
+    </div>
+</body>
+</html>

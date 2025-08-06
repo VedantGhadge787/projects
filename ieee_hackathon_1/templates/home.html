@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ECOI DOCCONNECT | Smarter Appointments</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <h2>DocConnect</h2>
+        <button onclick="toggleDarkMode()" class="toggle-btn">🌙 Toggle Dark Mode</button>
+        <div class="nav-links">
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
+        </div>
+    </div>
+
+    <div class="hero">
+        <h1>BOOK YOUR APPOINTMENT NOW!</h1>
+        <p>A smarter way for clinics and patients to manage appointments. Seamless scheduling, tracking, and healthcare management in one platform.</p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+            <a href="{{ url_for('register') }}" class="btn-register">Register</a>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2025 DocConnect. Built with ❤ for ECOI Hackathon.
+    </div>
+
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
+
+        window.onload = function () {
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+            }
+        };
+    </script>
+
+</body>
+</html>
