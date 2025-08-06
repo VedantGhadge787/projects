@@ -13,20 +13,33 @@
 
       <label>Role:</label>
       <select name="role" required>
-        <option value="patient">Patients</option>
-        <option value="doctor">Hospital Officials</option>
+        <option value="patient" {% if request.form.get('role') == 'patient' %}selected{% endif %}>Patients</option>
+        <option value="doctor" {% if request.form.get('role') == 'doctor' %}selected{% endif %}>Hospital Officials</option>
       </select><br><br>
 
       <label>Doctor Code:</label>
-      <input type="text" name="doc_code" placeholder="Only for Hospital officials (doc123)" /><br><br>
+      <input type="text" name="doc_code" placeholder="Only for Hospital officials (doc123)"
+             value="{{ request.form.get('doc_code','') }}" /><br><br>
 
       <label>Select Clinic:</label>
-      
       <select name="clinic_id">
         <option value="">Select a clinic</option>
         {% for clinic in clinics %}
-          <option value="{{ clinic.id }}">{{ clinic.name }} ({{ clinic.location }})</option>
+          <option value="{{ clinic.id }}" {% if request.form.get('clinic_id') == clinic.id|string %}selected{% endif %}>
+            {{ clinic.name }} ({{ clinic.location }})
+          </option>
         {% endfor %}
+      </select><br><br>
+
+      <!-- Added speciality dropdown (keeps form-preserved value) -->
+      <label>Select Speciality:</label>
+      <select name="speciality">
+        <option value="">Select a speciality</option>
+        <option value="oncologist" {% if request.form.get('speciality') == 'oncologist' %}selected{% endif %}>Oncologist</option>
+        <option value="dermatologist" {% if request.form.get('speciality') == 'dermatologist' %}selected{% endif %}>Dermatologist</option>
+        <option value="neurologist" {% if request.form.get('speciality') == 'neurologist' %}selected{% endif %}>Neurologist</option>
+        <option value="pediatrician" {% if request.form.get('speciality') == 'pediatrician' %}selected{% endif %}>Pediatrician</option>
+        <option value="orthodontist" {% if request.form.get('speciality') == 'orthodontist' %}selected{% endif %}>Orthodontist</option>
       </select><br><br>
 
       <button type="submit">Register</button>

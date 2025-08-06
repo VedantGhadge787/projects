@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Doctor Appointments</title>
+  <title>Patient Dashboard</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-
-  <!-- Flash Popup Alert -->
+ 
+  
   {% with messages = get_flashed_messages() %}
     {% if messages %}
       <div class="popup-alert" id="popupAlert">
@@ -25,26 +25,68 @@
   {% endwith %}
 
   <div class="container">
-    <h2>Your Appointments</h2>
+    <h1>Welcome to Your Dashboard</h1>
 
-    {% if bookings %}
-      <div class="appointment-list">
-        {% for slot in bookings %}
-          <div class="appointment-card">
-            <p><strong>Time:</strong> {{ slot.time }}</p>
-            <p><strong>Patient:</strong> {{ slot.patient_email }}</p>
-          </div>
+   
+
+    <div class="dashboard-section">
+      <h3>Choose your Doctor for the Appointment</h3>
+      <form method="POST">
+        {% for doctor in docs %}
+          <label>
+            <input type="radio" name="doc_id" value="{{ doctor.id }}" required>
+            Dr. {{ doctor.email }}
+          </label>
         {% endfor %}
-      </div>
-    {% else %}
-      <p style="text-align: center;">No appointments yet.</p>
-    {% endif %}
-
-    <div style="text-align: center; margin-top: 20px;">
-      <a href="/doc_dashboard"><button>Back to Dashboard</button></a>
+        <button type="submit">Choose Doctor</button>
+      </form>
     </div>
+
+    {% if selected_doctor %}
+    <div class="dashboard-section">
+      <h3>Available Time Slots with Dr. {{ selected_doctor.email }}</h3>
+      <form method="POST">
+        <input type="hidden" name="selected_doc_id" value="{{ selected_doctor.id }}">
+        <div class="timeslot-container">
+          {% for time in selected_doctor.all_time %}
+  {% set disabled = time in booked_slot_times %}
+  <input type="radio"
+         id="slot{{ time }}"
+         name="time"
+         value="{{ time }}"
+         {% if disabled %}disabled{% endif %}
+         required
+         class="timeslot-radio"
+         hidden>
+  <label for="slot{{ time }}"
+         class="timeslot-btn {% if disabled %}disabled{% endif %}">
+    {{ time }}{% if disabled %} (Booked){% endif %}
+  </label>
+{% endfor %}
+
+        </div>
+        <button type="submit">Book Slot</button>
+      </form>
+    </div>
+    {% endif %}
   </div>
 
-  <script src="{{ url_for('static', filename='main.js') }}"></script>
+  <!-- Optional dark mode toggle -->
+  <script>
+    const toggleBtn = document.querySelector('.toggle-btn');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+      });
+    }
+
+    // Persist dark mode
+    window.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+      }
+    });
+  </script>
 </body>
 </html>

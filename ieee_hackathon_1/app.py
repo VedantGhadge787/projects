@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
-from models import db, User, Doctor, Clinic
+from models import db, User, Doctor, Clinic, SpecialityEnum
 import bcrypt
 import os
 def emailcorrecting(email):
@@ -15,6 +15,9 @@ app.secret_key = os.urandom(24)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///doc_app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
+
+SPECIALTIES_FOR_TEMPLATE = [(member.name, member.value) for member in SpecialityEnum]
+
 
 with app.app_context():
     db.create_all()
@@ -60,10 +63,23 @@ def register():
         hashed = bcrypt.hashpw(password, bcrypt.gensalt())
 
         if role == 'doctor':
+            speciality_name = request.form.get('speciality', '').strip()
+            if not speciality_name:
+                flash("Please select a speciality.")
+                return render_template('register.html', clinics=clinics, specialties=SPECIALTIES_FOR_TEMPLATE)
+
+            try:
+                speciality_enum = SpecialityEnum[speciality_name]  # KeyError if invalid
+            except KeyError:
+                flash("Invalid speciality selected.")
+                return render_template('register.html', clinics=clinics, specialties=SPECIALTIES_FOR_TEMPLATE)
+            
+            
             clinic = Clinic.query.get(int(clinic_id)) if clinic_id else None
             new_user = Doctor(
                 email=email,
                 password=hashed,
+                speciality=speciality_enum,
                 clinic=clinic,
                 all_time=['10', '11', '12', '14', '15', '16', '17', '18', '19', '20', '21', '22'],
                 booked_time=[]
@@ -81,7 +97,7 @@ def register():
             session['user_id'] = new_user.id
             return redirect('/select_clinic')
 
-    return render_template('register.html', clinics=clinics)
+    return render_template('register.html', clinics=clinics, specialties=SPECIALTIES_FOR_TEMPLATE)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -118,39 +134,82 @@ def dashboard():
         return redirect('/login')
 
     clinic_id = request.args.get('clinic_id')
+    speciality_name = request.args.get('speciality', '').strip()
+
+    # Build base query and apply filters
+    query = Doctor.query
     if clinic_id:
-        docs = Doctor.query.filter_by(clinic_id=int(clinic_id)).all()
-    else:
-        docs = Doctor.query.all()
+        query = query.filter_by(clinic_id=int(clinic_id))
+
+    if speciality_name:
+        try:
+            speciality_enum = SpecialityEnum[speciality_name]
+            query = query.filter(Doctor.speciality == speciality_enum)
+        except KeyError:
+            flash("Invalid speciality filter.")
+            # fall back to clinic-only filter
+
+    docs = query.all()
 
     selected_doctor = None
 
     if request.method == 'POST':
-        if 'doc_id' in request.form:
-            doc_id = request.form['doc_id']
-            selected_doctor = Doctor.query.get(int(doc_id))
-        elif 'time' in request.form:
-            time = request.form['time']
+        # 1) Booking form (has 'time' and 'selected_doc_id')
+        if 'time' in request.form and 'selected_doc_id' in request.form:
+            time = request.form.get('time')
+            doc_id = request.form.get('selected_doc_id')
             patient = User.query.get(session['user_id'])
-            doc_id = request.form['selected_doc_id']
-            doctor = Doctor.query.get(int(doc_id))
-            booked_slot_times = [slot['time'] for slot in doctor.booked_time]
 
-            if any(slot['time'] == time for slot in doctor.booked_time):
+            if not doc_id or not time:
+                flash("Invalid booking request.")
+                return redirect(url_for('dashboard', clinic_id=clinic_id, speciality=speciality_name))
+
+            doctor = Doctor.query.get(int(doc_id))
+            if not doctor:
+                flash("Doctor not found.")
+                return redirect(url_for('dashboard', clinic_id=clinic_id, speciality=speciality_name))
+
+            # normalize booked_time structure (list of dicts with 'time' and 'patient_email')
+            booked_slot_times = [slot['time'] for slot in (doctor.booked_time or [])]
+
+            if time in booked_slot_times:
                 flash("Time slot already booked.")
+                return redirect(url_for('dashboard', clinic_id=clinic_id, speciality=speciality_name, doc_id=doc_id))
             else:
-                doctor.booked_time.append({"time": time, "patient_email": patient.email})
+                # append booking dict
+                bt = doctor.booked_time or []
+                bt.append({"time": time, "patient_email": patient.email})
+                doctor.booked_time = bt
                 db.session.commit()
                 flash("Booking successful!")
-                return redirect(url_for('dashboard', clinic_id=clinic_id, doc_id=doc_id))
+                # redirect back to dashboard and show selected doctor's slots
+                return redirect(url_for('dashboard', clinic_id=clinic_id, speciality=speciality_name, doc_id=doc_id))
+
+        # 2) Doctor selection form (has 'doc_id' only)
+        elif 'doc_id' in request.form:
+            doc_id = request.form.get('doc_id')
+            if doc_id:
+                return redirect(url_for('dashboard', clinic_id=clinic_id, speciality=speciality_name, doc_id=doc_id))
+
+        # unknown POST payload -> reload
+        flash("Invalid form submission.")
+        return redirect(url_for('dashboard', clinic_id=clinic_id, speciality=speciality_name))
+
     else:
+        # GET case: maybe show selected doctor if doc_id in query string
         doc_id = request.args.get('doc_id')
         if doc_id:
             selected_doctor = Doctor.query.get(int(doc_id))
+
+    # Prepare booked slot list for template
     booked_slot_times = []
     if selected_doctor:
-        booked_slot_times = [slot['time'] for slot in selected_doctor.booked_time]
-    return render_template('dashboard.html', docs=docs, selected_doctor=selected_doctor, booked_slot_times=booked_slot_times)
+        booked_slot_times = [slot['time'] for slot in (selected_doctor.booked_time or [])]
+
+    return render_template('dashboard.html',
+                           docs=docs,
+                           selected_doctor=selected_doctor,
+                           booked_slot_times=booked_slot_times)
 
 @app.route('/select_clinic')
 def select_clinic():
@@ -159,7 +218,7 @@ def select_clinic():
         return redirect('/login')
 
     clinics = Clinic.query.all()
-    return render_template('clinic_selection.html', clinics=clinics)
+    return render_template('clinic_selection.html', clinics=clinics, specialties=SPECIALTIES_FOR_TEMPLATE)
 
 @app.route('/doc_dashboard')
 def doc_dashboard():
@@ -174,10 +233,28 @@ def doc_dashboard():
     bookings.sort(key=get_time)
 
     return render_template('doc_dashboard.html', bookings=bookings, doctor=doctor)
+
+
 @app.route('/clinic_select', methods=['POST'])
 def go_to_doctor_page():
-    clinic_id = request.form['clinic_id']
-    return redirect(url_for('dashboard', clinic_id=clinic_id))
+    clinic_id = request.form.get('clinic_id', '').strip()
+    speciality = request.form.get('speciality', '').strip()  
+
+    if not clinic_id:
+        flash("Please choose a clinic.")
+        return redirect(url_for('select_clinic'))
+
+    
+    if speciality:
+        try:
+            _ = SpecialityEnum[speciality]   
+        except KeyError:
+            flash("Invalid speciality selected.")
+            return redirect(url_for('select_clinic'))
+
+    
+    return redirect(url_for('dashboard', clinic_id=clinic_id, speciality=speciality))
+
 
 @app.route('/logout')
 def logout():
