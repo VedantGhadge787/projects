@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Doctor Appointments</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- Flash Popup Alert -->
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="popup-alert" id="popupAlert">
+        {% for message in messages %}
+          {{ message }}
+        {% endfor %}
+      </div>
+      <script>
+        setTimeout(() => {
+          const alert = document.getElementById('popupAlert');
+          if (alert) alert.style.display = 'none';
+        }, 3000);
+      </script>
+    {% endif %}
+  {% endwith %}
+
+  <div class="container">
+    <h2>Your Appointments</h2>
+
+    {% if bookings %}
+      <div class="appointment-list">
+        {% for slot in bookings %}
+          <div class="appointment-card">
+            <p><strong>Time:</strong> {{ slot.time }}</p>
+            <p><strong>Patient:</strong> {{ slot.patient_email }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="text-align: center;">No appointments yet.</p>
+    {% endif %}
+
+    <div style="text-align: center; margin-top: 20px;">
+      <a href="/doc_dashboard"><button>Back to Dashboard</button></a>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>

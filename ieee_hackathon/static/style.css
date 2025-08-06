@@ -1,0 +1,352 @@
+/* =================== */
+/* RESET & UNIVERSALS  */
+/* =================== */
+
+* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* ========================= */
+/* BASE STYLING & CONTAINER  */
+/* ========================= */
+
+body {
+  /* fallback for ultra old browsers */
+  color: #2c3e50;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---- Modern light mode background ---- */
+body:not(.dark-mode) {
+  background:
+    linear-gradient(120deg, rgba(240,244,255,0.95) 0%, rgba(235,245,255,0.97) 100%),
+    radial-gradient(ellipse at 80% 20%, #c4f0fe 0%, transparent 60%),
+    radial-gradient(ellipse at 0% 90%, #dedaff 0%, transparent 70%),
+    radial-gradient(circle at 60% 80%, #ffe9ec 0%, transparent 70%);
+  background-blend-mode: lighten;
+  color: #2c3e50;
+}
+
+/* ---- Container with glass effect ---- */
+.container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.86);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.10);
+  backdrop-filter: blur(2px);
+}
+
+/* =============== */
+/* HEADING STYLES  */
+/* =============== */
+h1, h2, h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+/* ========================= */
+/* DASHBOARD & SECTION CARD  */
+/* ========================= */
+.dashboard-section {
+  margin: 30px 0;
+  padding: 20px;
+  border: 1px solid #dfe6e9;
+  border-radius: 10px;
+  background-color: #f9fbfd;
+}
+
+/* ================ */
+/* FORM INPUTS      */
+/* ================ */
+input[type="text"],
+input[type="password"],
+select {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0 20px 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+input[type="radio"] {
+  margin-right: 10px;
+  transform: scale(1.2);
+  accent-color: #007bff;
+}
+
+/* ========================= */
+/* LABELS & DISABLED STATES  */
+/* ========================= */
+label {
+  font-size: 16px;
+  display: block;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+input[disabled] + label, 
+label input[disabled] {
+  color: #aaa;
+  text-decoration: line-through;
+}
+
+/* ============== */
+/* BUTTON STYLES  */
+/* ============== */
+button {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* ===== LINKS ==== */
+a {
+  color: #007bff;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+  color: #0056b3;
+}
+
+/* =============== */
+/* FLASH MESSAGES  */
+/* =============== */
+.flash {
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  color: #fff;
+  background-color: #28a745;
+  text-align: center;
+}
+
+/* =============== */
+/* RESPONSIVE      */
+/* =============== */
+@media (max-width: 600px) {
+  .container {
+    padding: 20px;
+  }
+  button {
+    width: 100%;
+  }
+}
+
+/* =============== */
+/* POPUP ALERT     */
+/* =============== */
+.popup-alert {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #d4edda;
+  color: #155724;
+  padding: 15px 30px;
+  border-radius: 8px;
+  border: 1px solid #c3e6cb;
+  box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
+  font-weight: 500;
+  font-size: 16px;
+  z-index: 1000;
+  text-align: center;
+}
+
+/* ========================= */
+/* HOMEPAGE & NAV COMPONENTS */
+/* ========================= */
+.navbar {
+  background-color: white;
+  padding: 20px 40px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar h2 {
+  font-size: 30px;
+  color: #007bff;
+  font-weight: bold;
+}
+
+.navbar .nav-links a {
+  margin-left: 25px;
+  text-decoration: none;
+  font-weight: 500;
+  color: #2c3e50;
+  transition: 0.3s;
+}
+
+.navbar .nav-links a:hover {
+  color: #007bff;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 100px 20px 120px 20px;
+  background-image: url('https://images.unsplash.com/photo-1588776814546-ec7e5b940b25?auto=format&fit=crop&w=1740&q=80');
+  background-size: cover;
+  background-position: center;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+}
+
+/* Light mode: make .hero p legible on light image */
+body:not(.dark-mode) .hero p {
+  color: #4a6380;
+  text-shadow: none;
+}
+
+.hero h1 {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.hero p {
+  font-size: 20px;
+  max-width: 700px;
+  margin-bottom: 40px;
+}
+
+.hero-buttons a {
+  text-decoration: none;
+  padding: 15px 35px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 500;
+  margin: 10px;
+  display: inline-block;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Separate login/register buttons distinctly */
+.btn-login {
+  background-color: #007bff;
+  color: white;
+}
+.btn-login:hover {
+  background-color: #0056b3;
+}
+.btn-register {
+  background-color: transparent;
+  border: 2px solid white;
+  color: white;
+}
+.btn-register:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.footer {
+  text-align: center;
+  padding: 20px;
+  color: #868e96;
+  font-size: 14px;
+  background-color: #f1f3f5;
+}
+
+/* ================ */
+/* DARK MODE STYLES */
+/* ================ */
+
+body.dark-mode {
+  background: linear-gradient(to right, #1e1e1e, #343a40);
+  color: #f1f1f1;
+}
+
+body.dark-mode .navbar {
+  background-color: #1c1c1c;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .navbar h2,
+body.dark-mode .navbar .nav-links a {
+  color: #f8f9fa;
+}
+
+body.dark-mode .navbar .nav-links a:hover {
+  color: #0d6efd;
+}
+
+body.dark-mode .hero h1 {
+  color: #f1f1f1;
+}
+
+body.dark-mode .hero p {
+  color: #cccccc;
+}
+
+body.dark-mode .btn-register {
+  background-color: transparent;
+  border: 2px solid #f1f1f1;
+  color: #f1f1f1;
+}
+
+body.dark-mode .btn-register:hover {
+  background-color: #f1f1f1;
+  color: #000;
+}
+
+body.dark-mode .footer {
+  background-color: #212529;
+  color: #ccc;
+}
+
+/* ======== */
+/* TOGGLE   */
+/* ======== */
+.toggle-btn {
+  margin-left: 20px;
+  background-color: transparent;
+  border: 2px solid #007bff;
+  color: #007bff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+}
+.toggle-btn:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.appointment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.appointment-card {
+  background-color: #f0f0f0;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}

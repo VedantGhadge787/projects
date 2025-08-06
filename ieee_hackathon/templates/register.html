@@ -8,28 +8,29 @@
   <div class="container">
     <h2>Register</h2>
     <form method="POST">
-      <input type="text" name="username" placeholder="Username" required><br>
-      <input type="password" name="password" placeholder="Password" required><br>
+      <input type="text" name="username" placeholder="Username" required /><br>
+      <input type="password" name="password" placeholder="Password" required /><br>
 
       <label>Role:</label>
       <select name="role" required>
-        <option value="patient">Patient</option>
-        <option value="doctor">Hospital Official</option>
-      </select><br>
+        <option value="patient">Patients</option>
+        <option value="doctor">Hospital Officials</option>
+      </select><br><br>
 
       <label>Doctor Code:</label>
-      <input type="text" name="doc_code" placeholder="Only for Hospital officials (doc123)"><br>
+      <input type="text" name="doc_code" placeholder="Only for Hospital officials (doc123)" /><br><br>
 
       <label>Select Clinic:</label>
-      <select name="clinic_id" required>
+      
+      <select name="clinic_id">
+        <option value="">Select a clinic</option>
         {% for clinic in clinics %}
-          <option value="{{ clinic.id }}">Clinic {{ clinic.id }}</option>
+          <option value="{{ clinic.id }}">{{ clinic.name }} ({{ clinic.location }})</option>
         {% endfor %}
-      </select><br>
+      </select><br><br>
 
       <button type="submit">Register</button>
     </form>
-
     <p><a href="/login">Already have an account? Login</a></p>
   </div>
 </body>

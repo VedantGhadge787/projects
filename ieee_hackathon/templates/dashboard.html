@@ -1,48 +1,66 @@
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard</title>
+  <title>Patient Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Dashboard is working!</h1>
-    <p>If you see this, the template is connected and routing is correct.</p>
-    
-    <form method = "POST">
-      <h3>Choose your Doctor for the appointment: </h3> 
-      {% for doctor in docs %}
-      <label> 
-      <input type="radio" name="doc_id" value = "{{ doctor.id }}" required>
-      Dr.{{doctor.email}}
-        </label><br>
-        {% endfor %}
-        <button type = "submit"> Choose Doctor</button>
-    </form>
-    
-
-
-  {% if selected_doctor %}
-  <form method="POST">
-    <input type="hidden" name="selected_doc_id" value="{{ selected_doctor.id }}">
-
-    {% for time in selected_doctor.all_time %}
-      <label>
-        <input type="radio" name="time" value="{{ time }}"
-               {% if time in selected_doctor.booked_time %}
-                disabled 
-                {% endif %} required>
-
-
-        {{ time }} {% if time in selected_doctor.booked_time %}(Booked){% endif %}
-      </label><br>
-    {% endfor %}
-
-    <button type="submit">Book Slot</button>
-  </form>
+  <!-- Flash Popup Alert -->
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="popup-alert" id="popupAlert">
+      {% for message in messages %}
+        {{ message }}
+      {% endfor %}
+    </div>
+    <script>
+      // Auto-hide popup after 3 seconds
+      setTimeout(() => {
+        const alert = document.getElementById('popupAlert');
+        if (alert) alert.style.display = 'none';
+      }, 3000);
+    </script>
   {% endif %}
+  {% endwith %}
 
 
-   
+  <div class="container">
+    <h1>Welcome to Your Dashboard</h1>
 
+    <div class="dashboard-section">
+      <h3>Choose your Doctor for the Appointment</h3>
+      <form method="POST">
+        {% for doctor in docs %}
+        <label>
+          <input type="radio" name="doc_id" value="{{ doctor.id }}" required>
+          Dr. {{ doctor.email }}
+        </label>
+        {% endfor %}
+        <button type="submit">Choose Doctor</button>
+      </form>
+    </div>
+
+    {% if selected_doctor %}
+    <div class="dashboard-section">
+      <h3>Available Time Slots with Dr. {{ selected_doctor.email }}</h3>
+      <form method="POST">
+        <input type="hidden" name="selected_doc_id" value="{{ selected_doctor.id }}">
+
+        {% for time in selected_doctor.all_time %}
+          <label>
+            <input type="radio" name="time" value="{{ time }}"
+                   {% if time in selected_doctor.booked_time %}disabled{% endif %} required>
+            {{ time }} {% if time in selected_doctor.booked_time %}(Booked){% endif %}
+          </label>
+        {% endfor %}
+
+        <button type="submit">Book Slot</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
 
 </body>
 </html>
