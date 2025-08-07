@@ -1,0 +1,89 @@
+{# dashboard.html #}
+{% extends "base.html" %}
+{% set show_navbar = False %}
+
+{% block title %}Patient Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+  <!--Logout Button -->
+  <div class="logout-bar">
+    <form action="{{ url_for('logout') }}" method="get">
+      <button type="submit" class="logout-btn">Logout</button>
+    </form>
+  </div>
+
+  <h1>Welcome to Your Dashboard</h1>
+
+  <!--Doctor Selection -->
+  <div class="dashboard-section">
+    <h3>Choose your Doctor for the Appointment</h3>
+    <form method="POST">
+      {% for doctor in docs %}
+        <label>
+          <input type="radio" name="doc_id" value="{{ doctor.id }}" required
+                 {% if selected_doctor and doctor.id == selected_doctor.id %}checked{% endif %}>
+          Dr. {{ doctor.email }}
+        </label>
+      {% endfor %}
+      <button type="submit">Choose Doctor</button>
+    </form>
+  </div>
+
+ 
+  {% if selected_doctor %}
+  <div class="dashboard-section">
+    <h3>Available Time Slots with Dr. {{ selected_doctor.email }}</h3>
+    <form method="POST">
+      <input type="hidden" name="selected_doc_id" value="{{ selected_doctor.id }}">
+
+
+
+
+
+
+      <!-- Date -->
+      <label for="selected_date"><strong>Select Date:</strong></label>
+      <input type="date"
+             name="selected_date"
+             id="selected_date"
+             value="{{ selected_date }}"
+             onchange="this.form.submit()" required>
+      <br><br>
+
+      {% if selected_date %}
+      
+
+
+       <!--  time slot -->
+      <div class="timeslot-container">
+        {% for time in selected_doctor.all_time %}
+          {% set is_booked = (selected_doctor.id, time) in booked_slot_times %}
+          <input type="radio"
+                 id="slot{{ time }}"
+                 name="time"
+                 value="{{ time }}"
+                 {% if is_booked %}disabled{% endif %}
+                 required
+                 class="timeslot-radio"
+                 hidden>
+          <label for="slot{{ time }}"
+                 class="timeslot-btn {% if is_booked %}disabled{% endif %}">
+            {{ time }}{% if is_booked %} (Booked){% endif %}
+          </label>
+        {% endfor %}
+      </div>
+
+      <button type="submit">Book Slot</button>
+      {% else %}
+        <p><em>Please select a date to view available slots.</em></p>
+      {% endif %}
+    </form>
+  </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}

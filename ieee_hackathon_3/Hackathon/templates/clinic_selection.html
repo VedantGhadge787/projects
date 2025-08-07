@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% set show_navbar = False %}
+
+{% block title %}Select Clinic{% endblock %}
+
+{% block content %}
+
+<!-- LOGOUT BUTTON: Must be OUTSIDE background wrapper or high z-index -->
+<div class="logout-btn">
+    <a href="{{ url_for('logout') }}">Logout</a>
+</div>
+
+<div class="background-wrapper">
+    <img src="{{ url_for('static', filename='images/slide1.jpg') }}" class="background-img" alt="Background">
+
+    <div class="content-over-image">
+        <div class="container">
+            <h2>Select a Clinic</h2>
+
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <ul>
+                  {% for m in messages %}
+                    <li>{{ m }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('go_to_doctor_page') }}" method="POST" class="form-box">
+                <label for="clinic">Choose a clinic:</label>
+                <select name="clinic_id" id="clinic" required>
+                    <option value="">-- choose clinic --</option>
+                    {% for clinic in clinics %}
+                        <option value="{{ clinic.id }}"
+                          {% if request.form.get('clinic_id') == clinic.id|string %}selected{% endif %}>
+                          {{ clinic.name }} - {{ clinic.location }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <br><br>
+
+                <label for="speciality">Choose a speciality (optional):</label>
+                <select name="speciality" id="speciality">
+                    <option value="">-- all specialities --</option>
+                    {% for name, display in specialties %}
+                      <option value="{{ name }}"
+                        {% if request.form.get('speciality') == name %}selected{% endif %}>
+                        {{ display }}
+                      </option>
+                    {% endfor %}
+                </select>
+                <br><br>
+
+                <button type="submit">Continue</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

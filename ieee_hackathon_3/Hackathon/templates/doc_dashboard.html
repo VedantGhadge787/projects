@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Doctor Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <!-- ✅ FullCalendar CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
+  <style>
+    #calendar {
+      max-width: 900px;
+      margin: 20px auto;
+          }
+
+    .logout-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    .logout-btn a {
+      background-color: #e74c3c;
+      color: white;
+      padding: 8px 16px;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    .logout-btn a:hover {
+      background-color: #c0392b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ✅ Logout button -->
+  <div class="logout-btn">
+    <a href="{{ url_for('logout') }}">Logout</a>
+  </div>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="popup-alert" id="popupAlert">
+        {% for message in messages %}
+          {{ message }}
+        {% endfor %}
+      </div>
+      <script>
+        setTimeout(() => {
+          const alert = document.getElementById('popupAlert');
+          if (alert) alert.style.display = 'none';
+        }, 3000);
+      </script>
+    {% endif %}
+  {% endwith %}
+
+  <div class="container">
+    <h2>Welcome, Dr. {{ doctor.email or "Doctor" }}!</h2>
+
+    <div class="dashboard-section">
+      <h3>Appointments</h3>
+      <p>Click below to view and manage all your appointments.</p>
+      <a href="/appointments">        <button>View All Appointments</button>      </a>
+    </div>
+
+    <div class="dashboard-section">
+      <h3>Calendar View</h3>
+      <div id="calendar"></div>
+    </div>
+  </div>
+
+  <!-- ✅ FullCalendar JS -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var calendarEl = document.getElementById('calendar');
+      
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        height: 'auto',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek'
+        },
+        timeZone: 'local',
+        events: {{ events | tojson | safe }}
+      });
+
+      calendar.render();
+    });
+  </script>
+
+</body>
+</html>

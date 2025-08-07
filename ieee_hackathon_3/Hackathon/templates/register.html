@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h2>Register</h2>
+    <form method="POST">
+      <input type="text" name="username" placeholder="Username" required /><br>
+      <input type="password" name="password" placeholder="Password" required /><br>
+
+      <label>Role:</label>
+      <select name="role" id="role" required onchange="toggleHospitalFields()">
+        <option value="patient" {% if request.form.get('role') == 'patient' %}selected{% endif %}>Patients</option>
+        <option value="doctor" {% if request.form.get('role') == 'doctor' %}selected{% endif %}>Hospital Officials</option>
+      </select><br><br>
+
+      <!-- Hospital-only fields -->
+      <div id="hospital-fields" style="display: none;">
+        <label>Doctor Code:</label>
+        <input type="text" name="doc_code" placeholder="Only for Hospital officials (doc123)"
+              value="{{ request.form.get('doc_code','') }}" /><br><br>
+
+        <label>Select Clinic:</label>
+        <select name="clinic_id">
+          <option value="">Select a clinic</option>
+          {% for clinic in clinics %}
+            <option value="{{ clinic.id }}" {% if request.form.get('clinic_id') == clinic.id|string %}selected{% endif %}>
+              {{ clinic.name }} ({{ clinic.location }})
+            </option>
+          {% endfor %}
+        </select><br><br>
+
+        <label>Select Speciality:</label>
+        <select name="speciality">
+          <option value="">Select a speciality</option>
+          <option value="oncologist" {% if request.form.get('speciality') == 'oncologist' %}selected{% endif %}>Oncologist</option>
+          <option value="dermatologist" {% if request.form.get('speciality') == 'dermatologist' %}selected{% endif %}>Dermatologist</option>
+          <option value="neurologist" {% if request.form.get('speciality') == 'neurologist' %}selected{% endif %}>Neurologist</option>
+          <option value="pediatrician" {% if request.form.get('speciality') == 'pediatrician' %}selected{% endif %}>Pediatrician</option>
+          <option value="orthodontist" {% if request.form.get('speciality') == 'orthodontist' %}selected{% endif %}>Orthodontist</option>
+        </select><br><br>
+      </div>
+
+      <button type="submit">Register</button>
+    </form>
+    <p><a href="/login">Already have an account? Login</a></p>
+  </div>
+
+  <script>
+    function toggleHospitalFields() {
+      const role = document.getElementById("role").value;
+      const hospitalFields = document.getElementById("hospital-fields");
+      hospitalFields.style.display = (role === "doctor") ? "block" : "none";
+    }
+
+    // Run on page load
+    document.addEventListener("DOMContentLoaded", toggleHospitalFields);
+  </script>
+</body>
+</html>
